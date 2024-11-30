@@ -1,22 +1,55 @@
 import React, { useEffect, useState } from "react";
 import Paginator from "../paginator/paginator";
-import { useFetchFakeData } from "../hooks/useFechFakeData";
+import { useFetch } from "../hooks/useFech";
+import Modal from "../Modal/Modal";
+import { useNavigate } from "react-router-dom";
 
 const Content = () => {
   const [users, setUsers] = useState([]);
-  const { data, loading } = useFetchFakeData();
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState("");
+  const [selectedUser, setSelectedUser] = useState(null);
+  const { data, loading, deleteData } = useFetch();
+  const navigate = useNavigate();
+
+  const handleView = (id) => {
+    navigate(`/user/${id}`);
+  };
 
   useEffect(() => {
-    if(data && data.data){
+    if (data && data.data) {
       setUsers(data.data);
     }
-  }, [data])
-  
+  }, [data]);
 
   if (loading) {
     return <div>Cargando...</div>;
   }
-  
+
+  const handleDelete = (user) => {
+    setSelectedUser(user);
+    setModalMessage(
+      `¿Estás seguro de que quieres eliminar a ${user.firstName}?`
+    );
+    setShowModal(true);
+  };
+
+  const confirmDelete = async () => {
+    if (selectedUser) {
+      const success = await deleteData(selectedUser.id);
+      if (success) {
+        setUsers(users.filter((user) => user.id !== selectedUser.id));
+        setShowModal(false);
+      } else {
+        console.error("Error eliminando usuario");
+      }
+    }
+  };
+
+  const capitalizeFirstLetter = (str) => {
+    if (!str) return "";
+    return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
+  };
 
   return (
     <div className="p-4 mb-4">
@@ -26,7 +59,10 @@ const Content = () => {
           placeholder="Buscar usuarios"
           className="border border-gray-300 rounded-md p-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
-        <button className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600">
+        <button
+          onClick={() => navigate("/create-user")}
+          className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600"
+        >
           Crear Usuario
         </button>
       </div>
@@ -43,24 +79,38 @@ const Content = () => {
           <tbody>
             {users.map((user) => (
               <tr key={user.id}>
-                <td className="py-2 px-4 border-b">{user.id}</td>
-                <td className="py-2 px-4 border-b">{user.name}</td>
+                <td className="py-2 px-4 border-b">
+                  <strong>{user.id}</strong>
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {capitalizeFirstLetter(user.title)}. {user.firstName}{" "}
+                  {user.lastName}
+                </td>
                 <td className="py-2 px-4 border-b">
                   <img
                     className="w-10 h-10 rounded-full"
-                    src={user.photo}
+                    src={user.picture}
                     alt="Foto"
                   />
                 </td>
                 <td className="text-right py-2 px-4 border-b">
                   <div className="space-x-2">
-                    <button className="bg-blue-500 text-white py-1 px-2 rounded-md hover:bg-blue-600">
+                    <button
+                      onClick={() => handleView(user.id)}
+                      className="bg-blue-500 text-white py-1 px-2 rounded-md hover:bg-blue-600"
+                    >
                       Ver
                     </button>
-                    <button className="bg-yellow-500 text-white py-1 px-2 rounded-md hover:bg-yellow-600">
+                    <button
+                      onClick={() => navigate(`/update-user/${user.id}`)}
+                      className="bg-yellow-500 text-white py-1 px-2 rounded-md hover:bg-yellow-600"
+                    >
                       Editar
                     </button>
-                    <button className="bg-red-500 text-white py-1 px-2 rounded-md hover:bg-red-600">
+                    <button
+                      onClick={() => handleDelete(user)}
+                      className="bg-red-500 text-white py-1 px-2 rounded-md hover:bg-red-600"
+                    >
                       Borrar
                     </button>
                   </div>
@@ -71,6 +121,14 @@ const Content = () => {
         </table>
       </div>
       <Paginator />
+
+      {showModal && (
+        <Modal
+          message={modalMessage}
+          onClose={() => setShowModal(false)}
+          onConfirm={confirmDelete}
+        />
+      )}
     </div>
   );
 };

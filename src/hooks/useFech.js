@@ -1,31 +1,49 @@
 import { useState, useEffect } from "react";
 
-export function useFetch(endpoint) {
+export function useFetch(endpoint = "") {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  url = `https://dummyapi.io/data/v1/${endpoint}`;
+  const baseUrl = "https://dummyapi.io/data/v1/user";
 
   const options = {
-    method: "GET",
     headers: {
-      "app-id": "0JyYiOQXQQr5H9OEn21312",
+      "app-id": "63473330c1927d386ca6a3a5",
     },
   };
 
   useEffect(() => {
     setLoading(true);
-    fetch(url, options)
+    fetch(`${baseUrl}${endpoint}`, { ...options, method: "GET" })
       .then((res) => res.json())
       .then((data) => {
         setData(data);
         setLoading(false);
       })
-      .catch.catch((error) => {
+      .catch((err) => {
+        setError(err);
         setLoading(false);
-        console.error("Error fetching data:", error);
       });
-  }, [url]);
+  }, [endpoint]);
 
-  return { data, loading };
+  const deleteData = async (id) => {
+    try {
+      const response = await fetch(`${baseUrl}/${id}`, {
+        ...options,
+        method: "DELETE",
+      });
+      if (!response.ok) throw new Error("Failed to delete data");
+      setData((prevData) => ({
+        ...prevData,
+        data: prevData.data.filter((item) => item.id !== id),
+      }));
+      return true;
+    } catch (err) {
+      setError(err);
+      return false;
+    }
+  };
+
+  return { data, loading, error, deleteData };
 }
