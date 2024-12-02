@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-export function useFetch(endpoint = "") {
+export function useFetch(endpoint = "", page = 0, limit = 5) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,7 +15,10 @@ export function useFetch(endpoint = "") {
 
   useEffect(() => {
     setLoading(true);
-    fetch(`${baseUrl}${endpoint}`, { ...options, method: "GET" })
+    fetch(`${baseUrl}${endpoint}?page=${page}&limit=${limit}`, {
+      ...options,
+      method: "GET",
+    })
       .then((res) => res.json())
       .then((data) => {
         setData(data);
@@ -25,7 +28,8 @@ export function useFetch(endpoint = "") {
         setError(err);
         setLoading(false);
       });
-  }, [endpoint]);
+  }, [endpoint, page, limit]);
+  console.log(data);
 
   const deleteData = async (id) => {
     try {

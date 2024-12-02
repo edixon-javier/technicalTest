@@ -1,6 +1,6 @@
-import React from "react";
+import PropTypes from "prop-types";
 
-const Paginator = () => {
+const Paginator = ({ currentPage, totalPages, onPageChange }) => {
   return (
     <nav
       className="flex justify-end bg-white"
@@ -8,65 +8,46 @@ const Paginator = () => {
     >
       <ul className="inline-flex -space-x-px text-sm">
         <li>
-          <a
-            href="#"
-            className="flex items-center justify-center px-3 h-8 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          <button
+            disabled={currentPage === 0}
+            onClick={() => onPageChange(currentPage - 1)}
+            className="flex items-center justify-center px-3 h-8 leading-tight text-teal-600 bg-white border border-gray-300 rounded-s-lg hover:bg-teal-100 hover:text-teal-800 disabled:opacity-50"
           >
             ←
-          </a>
+          </button>
         </li>
+        {[...Array(totalPages)].map((_, index) => (
+          <li key={index}>
+            <button
+              onClick={() => onPageChange(index)}
+              className={`flex items-center justify-center px-3 h-8 leading-tight ${
+                currentPage === index
+                  ? "text-blue-600 bg-blue-50"
+                  : "text-teal-600 bg-white hover:bg-teal-100 hover:text-teal-800"
+              } border border-gray-300`}
+            >
+              {index + 1}
+            </button>
+          </li>
+        ))}
         <li>
-          <a
-            href="#"
-            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            1
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            2
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            aria-current="page"
-            className="flex items-center justify-center px-3 h-8 text-blue-600 border border-gray-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
-          >
-            3
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            4
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
-          >
-            5
-          </a>
-        </li>
-        <li>
-          <a
-            href="#"
-            className="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+          <button
+            disabled={currentPage === totalPages - 1}
+            onClick={() => onPageChange(currentPage + 1)}
+            className="flex items-center justify-center px-3 h-8 leading-tight text-teal-600 bg-white border border-gray-300 rounded-e-lg hover:bg-teal-100 hover:text-teal-800 disabled:opacity-50"
           >
             →
-          </a>
+          </button>
         </li>
       </ul>
     </nav>
   );
+};
+
+Paginator.propTypes = {
+  currentPage: PropTypes.number.isRequired,
+  totalPages: PropTypes.number.isRequired,
+  onPageChange: PropTypes.func.isRequired,
 };
 
 export default Paginator;

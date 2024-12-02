@@ -1,16 +1,26 @@
-import React, { useEffect, useState } from "react";
-import Paginator from "../paginator/paginator";
-import { useFetch } from "../hooks/useFech";
-import Modal from "../Modal/Modal";
+import { useEffect, useState } from "react";
+import { SlPencil, SlTrash } from "react-icons/sl";
+import { VscOpenPreview } from "react-icons/vsc";
 import { useNavigate } from "react-router-dom";
+import { useFetch } from "../hooks/useFech";
+import Loading from "../Loading/Loading";
+import Modal from "../Modal/Modal";
+import Paginator from "../paginator/paginator";
 
 const Content = () => {
   const [users, setUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [selectedUser, setSelectedUser] = useState(null);
-  const { data, loading, deleteData } = useFetch();
+  const [page, setPage] = useState(0);  
+  const { data, loading, deleteData } = useFetch("", page, 5);
   const navigate = useNavigate();
+
+
+  const totalPages = data ? Math.ceil(data.total / 5) : 1;
+  
 
   const handleView = (id) => {
     navigate(`/user/${id}`);
@@ -19,11 +29,21 @@ const Content = () => {
   useEffect(() => {
     if (data && data.data) {
       setUsers(data.data);
+      setFilteredUsers(data.data); 
     }
   }, [data]);
 
+  useEffect(() => {
+    const filtered = users.filter((user) =>
+      `${user.firstName} ${user.lastName}`
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase())
+    );
+    setFilteredUsers(filtered);
+  }, [searchTerm, users]);
+
   if (loading) {
-    return <div>Cargando...</div>;
+    return <Loading />;
   }
 
   const handleDelete = (user) => {
@@ -57,7 +77,9 @@ const Content = () => {
         <input
           type="text"
           placeholder="Buscar usuarios"
-          className="border border-gray-300 rounded-md p-2 w-1/2 focus:outline-none focus:ring-2 focus:ring-green-500"
+          value={searchTerm} 
+          onChange={(e) => setSearchTerm(e.target.value)} 
+          className="border border-gray-300 rounded-md p-2 w-80 focus:outline-none focus:ring-2 focus:ring-green-500"
         />
         <button
           onClick={() => navigate("/create-user")}
@@ -77,7 +99,7 @@ const Content = () => {
             </tr>
           </thead>
           <tbody>
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <tr key={user.id}>
                 <td className="py-2 px-4 border-b">
                   <strong>{user.id}</strong>
@@ -97,21 +119,21 @@ const Content = () => {
                   <div className="space-x-2">
                     <button
                       onClick={() => handleView(user.id)}
-                      className="bg-blue-500 text-white py-1 px-2 rounded-md hover:bg-blue-600"
+                      className="bg-blue-500 text-white py-2 px-2 rounded-md hover:bg-blue-600 w-8 h-8"
                     >
-                      Ver
+                      <VscOpenPreview />
                     </button>
                     <button
                       onClick={() => navigate(`/update-user/${user.id}`)}
-                      className="bg-yellow-500 text-white py-1 px-2 rounded-md hover:bg-yellow-600"
+                      className="bg-yellow-500 text-white py-2 px-2 rounded-md hover:bg-yellow-600 w-8 h-8"
                     >
-                      Editar
+                      <SlPencil />
                     </button>
                     <button
                       onClick={() => handleDelete(user)}
-                      className="bg-red-500 text-white py-1 px-2 rounded-md hover:bg-red-600"
+                      className="bg-red-500 text-white py-2 px-2 rounded-md hover:bg-red-600 w-8 h-8"
                     >
-                      Borrar
+                      <SlTrash />
                     </button>
                   </div>
                 </td>
@@ -120,7 +142,11 @@ const Content = () => {
           </tbody>
         </table>
       </div>
-      <Paginator />
+      <Paginator
+        currentPage={page}
+        totalPages={totalPages}
+        onPageChange={setPage}
+      />
 
       {showModal && (
         <Modal

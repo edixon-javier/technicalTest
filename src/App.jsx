@@ -1,10 +1,9 @@
-import "./App.css";
-import Header from "./header/header";
-import Content from "./content/Content";
 import { HashRouter, Route, Routes } from "react-router-dom";
-import UserDetails from "./UserDetails/UserDetails ";
+import Content from "./content/Content";
 import CreateUser from "./CreateUser/CreateUser";
+import Header from "./header/header";
 import UpdateUser from "./UpdateUser/UpdateUser";
+import UserDetails from "./UserDetails/UserDetails ";
 
 function App() {
   return (

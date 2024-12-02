@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { useFetch } from "../hooks/useFech";
+import Loading from "../Loading/Loading";
 
 const UserDetails = () => {
   const { id } = useParams();
@@ -15,7 +16,7 @@ const UserDetails = () => {
   }, [data]);
 
   if (loading) {
-    return <div>Cargando datos del usuario...</div>;
+    return <Loading />;
   }
 
   if (error || !user) {
@@ -46,7 +47,7 @@ const UserDetails = () => {
           <strong>Titulo:</strong> {user.title}
         </p>
         <p>
-          <strong>Nombre:</strong> {user.firstName} 
+          <strong>Nombre:</strong> {user.firstName}
         </p>
         <p>
           <strong>Apellidos:</strong> {user.lastName}

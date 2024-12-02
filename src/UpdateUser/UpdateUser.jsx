@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 const UpdateUser = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // Obtener el ID del usuario desde la URL
+  const { id } = useParams();
   const [formData, setFormData] = useState({
     title: "mr",
     firstName: "",
@@ -15,7 +15,6 @@ const UpdateUser = () => {
     phone: "",
   });
 
-  // Cargar los datos del usuario al montar el componente
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -64,7 +63,7 @@ const UpdateUser = () => {
       const data = await response.json();
       console.log("Usuario actualizado:", data);
       alert("Usuario actualizado exitosamente");
-      navigate("/"); 
+      navigate("/");
     } catch (error) {
       console.error("Error al actualizar el usuario:", error);
       alert("Error al actualizar el usuario");
@@ -72,14 +71,14 @@ const UpdateUser = () => {
   };
 
   const handleCancel = () => {
-    navigate("/"); 
+    navigate("/");
   };
 
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">Modificar Usuario</h1>
       <div className="space-y-4">
-      <div>
+        <div>
           <label className="block text-sm font-medium mb-1">Id:</label>
           <input
             type="text"
@@ -158,7 +157,9 @@ const UpdateUser = () => {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Fecha de Nacimiento:</label>
+          <label className="block text-sm font-medium mb-1">
+            Fecha de Nacimiento:
+          </label>
           <input
             type="date"
             name="dateOfBirth"
